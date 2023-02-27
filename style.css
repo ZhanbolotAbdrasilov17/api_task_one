@@ -1,0 +1,105 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;700&display=swap');
+
+* {
+    font-family: 'Inter', sans-serif;
+}
+
+body {
+    background-color: #EFEFEF;
+    font-size: 0;
+
+}
+
+.itemParent {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 20px;
+
+}
+
+.item {
+    width: 300px;
+    background-color: white;
+    display: flex;
+    flex-direction: column;
+    padding: 28px 45px 0 23px;
+    height: 500px;
+}
+
+.title {
+    font-weight: 700;
+    font-size: 20px;
+    margin-bottom: 9px;
+}
+
+.item__photo {
+    background-image: url(./Rectangle\ 2\ \(2\).png);
+    background-repeat: no-repeat;
+    background-size: contain;
+    width: 100%;
+    height: 133px;
+    margin-bottom: 30px;
+}
+
+input {
+    width: 100%;
+}
+
+.number {
+    margin-right: 100px;
+}
+
+.scrapper-bottom {
+    margin-bottom: 30px;
+}
+
+.save {
+    background-color: #2155A4;
+    color: white;
+    font-size: 16px;
+    font-weight: 700;
+    border: none;
+    margin-bottom: 10px;
+    height: 30px;
+}
+
+.remove {
+    background-color: #A42141;
+    color: white;
+    font-size: 16px;
+    font-weight: 700;
+    border: none;
+    height: 30px;
+}
+
+.delivery {
+    margin-top: 18px;
+    display: flex;
+    gap: 40px;
+}
+
+.has-delivery {
+    background-color: #21A42E;
+    height: 25px;
+    color: white;
+    font-size: 16px;
+    font-weight: 700;
+    width: 45%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.delivery-status {
+   margin-top: 3px;
+   font-weight: 700;
+   font-size: 16px;
+}
+
+.input-stock {
+    font-size: 18px;
+}
+
+.input-cost {
+    font-size: 18px;
+}
