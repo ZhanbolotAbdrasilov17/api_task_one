@@ -1,94 +1,203 @@
-const buttonSaves = document.querySelectorAll('.save')
-const buttonRemoves = document.querySelectorAll('.remove')
-const buttonDeliveries = document.querySelectorAll('.has-delivery')
-const statusDeliveries = document.querySelectorAll('.delivery-status')
-const images = document.querySelectorAll('.item__photo')
-const titles = document.querySelectorAll('.title')
-const allItems = document.querySelectorAll('.item')
+const API = `http://localhost:1717`
 
-const inputStocks = document.querySelectorAll('.stock')
-const inputCosts = document.querySelectorAll('.cost')
+// Name
+const creatName = (el) => {
+  const name = document.createElement('h3')
+  name.textContent = el.name
+  return name
+}
 
-const api = fetch(`http://localhost:1717/pastry`)
-const allId = []
+// Image
+const createImg = (source) => {
+  const image = document.createElement('img')
+  image.src = source.image
+  image.classList.add('image')
+  return image
+}
+
+// Stock and Cost
+const creatStock = (amount) => {
+  const parentStock = document.createElement('div')
+  parentStock.classList.add('parent-info')
+
+  const label = document.createElement('label')
+  label.setAttribute('id', 'stock')
+  label.innerHTML = 'Stock:'
+
+  const inputStock = document.createElement('input')
+  inputStock.setAttribute('id', 'stock')
+  inputStock.setAttribute('type', "number")
+  inputStock.setAttribute('value', amount)
+
+  parentStock.append(label)
+  parentStock.append(inputStock)
+
+  return parentStock
+}
+
+const creatCost = (price) => {
+  const parentCost = document.createElement('div')
+  parentCost.classList.add('parent-info')
+
+  const label = document.createElement('label')
+  label.setAttribute('id', 'cost')
+  label.innerHTML = 'Cost:'
+
+  const inputCost = document.createElement('input')
+  inputCost.setAttribute('id', 'cost')
+  inputCost.setAttribute('type', "number")
+  inputCost.setAttribute('value', price)
+
+  parentCost.append(label)
+  parentCost.append(inputCost)
+
+  return parentCost
+}
 
 
-api
-    .then(x => {
-        return x.json()
+const creatSaveBtn = (id, stock, cost) => {
+  const save = document.createElement('button')
+  save.textContent = 'Save changes'
+  save.classList.add('save')
+
+  save.addEventListener('click', () => {
+    const stockValue = stock.querySelector('input').value
+    const costValue = cost.querySelector('input').value
+    changeSave(id, stockValue, costValue)
+  })
+
+  return save
+}
+
+ async function changeSave(id, inStock, cost)  {
+  console.log('qaqaq', inStock, cost)
+  const response = await fetch(`http://localhost:1717/pastry/update/${id}`, {
+    method: 'PUT',
+    headers: {
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify({
+      inStock: Number(inStock),
+      cost: Number(cost)
     })
-    .then(async (responsePastry) => {
-        responsePastry.forEach(k => {
-            allId.push(k.id)
-        })
-        
-        const redactPastry = async (id, data) => {
-            console.log(data)
-            console.log(id)
+  })
+  const data = await response.json()
+  console.log(data);
+    // .catch(error => {
+    //   console.error('Failed to update:', error)
+    // })
+}
 
-            const response = await fetch(`http://localhost:1717/pastry/update/${id}`, {
-                method: 'PUT',
-                body: JSON.stringify(data),
-                headers: {
-                  'Content-Type': 'application/json'
-                }
-              })        
-              if (!response.ok) {
-                const message = await response.text()
-                console.error(`Error updating pastry: ${message}`)
-                return
-              }
-              console.log(JSON.stringify(data))
-        } 
+// Remove
+const creatRemoveBtn = (id) => {
+  const removeBtn = document.createElement('button')
+  removeBtn.classList.add('remove')
+  removeBtn.textContent = 'Remove'
 
-        const removePastry = async (id, index) => {
-            allItems[index].style.display = 'none'
-            const response = await fetch(`http://localhost:1717/pastry/delete/${id}`, {
-                method: 'DELETE'
-            })
-            
-            console.log(response)
-        }
+  removeBtn.addEventListener('click', () => {
+    const del = removeAct(id)
+    return del
+  })
+  return removeBtn
+}
 
-            setTimeout(() => {
-                for (let i = 0; i < allId.length; i++) {
-                console.log(i)
-                console.log(buttonSaves[i])
-                buttonRemoves[i].addEventListener('click', () => {
-                    removePastry(allId[i], i)
-                })
-                buttonSaves[i].addEventListener('click', () => {
-                    console.log(inputStocks[i].value)
-                    console.log(inputCosts[i].value)
-                    redactPastry(allId[i], {
-                    inStock: Number(`${inputStocks[i].value}`),
-                    cost: Number(`${inputCosts[i].value}`)
-                })
+const removeAct = async (del) => {
+  try {
+    const response = await fetch(`http://localhost:1717/pastry/delete/${del.id}`, {
+      method: 'DELETE',
+    })
+    const result = await response.json()
+    return result
+  } catch (error) {
+    console.log(`Failed to delete`);
+  }
+}
+
+
+// Delivery 
+const createDelivery = (source) => {
+  // Parent div for button and answer
+  const deliveryContainer = document.createElement('div')
+  deliveryContainer.classList.add('delivery-part')
+
+  // Button has Delivery?
+  const deliveryButton = document.createElement('button')
+  deliveryButton.textContent = 'Has delivery?'
+  deliveryButton.classList.add('delivery-button')
+
+  // Answer: has delivery?
+  const deliveryAnswer = document.createElement('p')
+  deliveryAnswer.textContent = 'Unknown'
+  deliveryAnswer.classList.add('delivery-answer') 
+
+  // new request
+  deliveryButton.addEventListener('click', () => {
+    changeAnswer(source, deliveryAnswer)
+  })
+
+  deliveryContainer.append(deliveryButton, deliveryAnswer)
+  return deliveryContainer
+}
+
+async function changeAnswer(source, deliveryAnswer) {
+  const response = await fetch(`http://localhost:1717/pastry/detail/${source.id}`)
+  const data = await response.json()
+
+  const glovo = data.hasDelivery
+  if (glovo) {
+    deliveryAnswer.innerHTML = 'yes'
+  } else {
+    deliveryAnswer.innerHTML = 'no'
+  }
+}
+
+
+// Show pastry
+async function renderAllPastry() {
+  try {
+    const response = await fetch(`${API}/pastry/`)
+    const data = await response.json()
     
-                })
-            }
-            }, 2000)
+    const cardContainer = document.getElementById('card-container')
+    cardContainer.classList.add('card-container')
+    
+    data.forEach(item => {
+
+      const card = document.createElement('div')
+      card.classList.add('card')
+    
+      // Setting name
+      const pastryName = creatName(item)
+      card.append(pastryName)
+  
+
+      // Setting image
+      const pastryImage = createImg(item)
+      card.append(pastryImage)
 
 
-        for (let i = 0; i<responsePastry.length; i++) {
+      const stock = creatStock(item.inStock)
+      const cost = creatCost(item.cost)
+      card.append(stock, cost)
 
-            const timerImages = await responsePastry[i]
-            setTimeout(() => {
-                images[i].style.backgroundImage = `url(${responsePastry[i].image})`
-                titles[i].textContent = `${responsePastry[i].name}`
-                fetch(`http://localhost:1717/pastry/detail/${responsePastry[i].id}`)  
-                .then(x => x.json() )
-                .then(async (responseDetails) => {
+      const change = creatSaveBtn(item.id, stock, cost)
+      card.append(change)
 
-                    buttonDeliveries[i].addEventListener('click', () => {
-                    statusDeliveries[i].textContent = `${responseDetails.hasDelivery}`
-        
-                    })
-                })         
-            }, timerImages)
-        }
-        for (let i = 0; i<responsePastry.length; i++) {
+      // remove
+      const removePastry = creatRemoveBtn(item)
+      card.append(removePastry)
+      
 
-        }
+      // Setting delivery forms
+      const pastryDelivery = createDelivery(item)
+      card.append(pastryDelivery)
+
+
+      cardContainer.append(card)
     })
+  } catch {
+    console.log('try');
+  }
+}
 
+renderAllPastry()
